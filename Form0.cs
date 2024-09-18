@@ -1,38 +1,40 @@
 namespace WinFormsApp1
 {
-	/*
-	public partial class Form0 : Form
+	partial class Form0 : Form
 	{
-		public Form0()
-		{
-			InitializeComponent();
-		}
-	}
-	*/
+		private readonly Panel buttonPanel = new();
+		private readonly DataGridView songsDataGridView = new();
+		private readonly Button addNewRowButton = new();
+		private readonly Button deleteRowButton = new();
 
-	// https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.datagridview?view=windowsdesktop-8.0
-
-	public partial class Form0 : System.Windows.Forms.Form
-	{
-		private Panel buttonPanel = new Panel();
-		private DataGridView songsDataGridView = new DataGridView();
-		private Button addNewRowButton = new Button();
-		private Button deleteRowButton = new Button();
+		private static readonly List<string[]> rows = new List<string[]>
+										{
+											new string[] { "13/12/1968", "29", "Revolution 9", "Beatles", "The Beatles [White Album]" },
+											new string[] { "1/1/1960", "6", "Fools Rush In", "Frank Sinatra", "Nice 'N' Easy" },
+											new string[] { "11/11/1971", "1", "One of These Days", "Pink Floyd", "Meddle" },
+											new string[] { "1/1/1988", "7", "Where Is My Mind?", "Pixies", "Surfer Rosa" },
+											new string[] { "1/5/1981", "9", "Can't Find My Mind", "Cramps", "Psychedelic Jungle" },
+											new string[] { "6/10/2003", "13", "Scatterbrain. (As Dead As Leaves.)", "Radiohead", "Hail to the Thief" },
+											new string[] { "6/3/1992", "3", "Dress", "P J Harvey", "Dry" }
+										};
 
 		public Form0()
 		{
 			this.Load += new EventHandler(Form0_Load);
 		}
 
-		private void Form0_Load(System.Object sender, System.EventArgs e)
+		private void Form0_Load(object? sender, System.EventArgs e)
 		{
 			SetupLayout();
 			SetupDataGridView();
 			PopulateDataGridView();
+			Console.WriteLine(">> Initialized.");
 		}
 
-		private void songsDataGridView_CellFormatting(object sender,
-			System.Windows.Forms.DataGridViewCellFormattingEventArgs e)
+		// ...
+
+		private void SongsDataGridView_CellFormatting(object? sender,
+	System.Windows.Forms.DataGridViewCellFormattingEventArgs e)
 		{
 			if (e != null)
 			{
@@ -42,7 +44,9 @@ namespace WinFormsApp1
 					{
 						try
 						{
-							e.Value = DateTime.Parse(e.Value.ToString())
+							var dateValue = e.Value.ToString();
+							if (dateValue == null) throw new FormatException();
+							e.Value = DateTime.Parse(dateValue)
 								.ToLongDateString();
 							e.FormattingApplied = true;
 						}
@@ -55,13 +59,15 @@ namespace WinFormsApp1
 			}
 		}
 
-		private void addNewRowButton_Click(object sender, EventArgs e)
+		private void AddNewRowButton_Click(object? sender, EventArgs e)
 		{
+			Console.WriteLine(">> Click.");
 			this.songsDataGridView.Rows.Add();
 		}
 
-		private void deleteRowButton_Click(object sender, EventArgs e)
+		private void DeleteRowButton_Click(object? sender, EventArgs e)
 		{
+			Console.WriteLine(">> Click.");
 			if (this.songsDataGridView.SelectedRows.Count > 0 &&
 				this.songsDataGridView.SelectedRows[0].Index !=
 				this.songsDataGridView.Rows.Count - 1)
@@ -77,11 +83,11 @@ namespace WinFormsApp1
 
 			addNewRowButton.Text = "Add Row";
 			addNewRowButton.Location = new Point(10, 10);
-			addNewRowButton.Click += new EventHandler(addNewRowButton_Click);
+			addNewRowButton.Click += new EventHandler(AddNewRowButton_Click);
 
 			deleteRowButton.Text = "Delete Row";
 			deleteRowButton.Location = new Point(100, 10);
-			deleteRowButton.Click += new EventHandler(deleteRowButton_Click);
+			deleteRowButton.Click += new EventHandler(DeleteRowButton_Click);
 
 			buttonPanel.Controls.Add(addNewRowButton);
 			buttonPanel.Controls.Add(deleteRowButton);
@@ -128,34 +134,15 @@ namespace WinFormsApp1
 
 			songsDataGridView.CellFormatting += new
 				DataGridViewCellFormattingEventHandler(
-				songsDataGridView_CellFormatting);
+				SongsDataGridView_CellFormatting);
 		}
 
 		private void PopulateDataGridView()
 		{
-
-			string[] row0 = { "11/22/1968", "29", "Revolution 9",
-			"Beatles", "The Beatles [White Album]" };
-			string[] row1 = { "1960", "6", "Fools Rush In",
-			"Frank Sinatra", "Nice 'N' Easy" };
-			string[] row2 = { "11/11/1971", "1", "One of These Days",
-			"Pink Floyd", "Meddle" };
-			string[] row3 = { "1988", "7", "Where Is My Mind?",
-			"Pixies", "Surfer Rosa" };
-			string[] row4 = { "5/1981", "9", "Can't Find My Mind",
-			"Cramps", "Psychedelic Jungle" };
-			string[] row5 = { "6/10/2003", "13",
-			"Scatterbrain. (As Dead As Leaves.)",
-			"Radiohead", "Hail to the Thief" };
-			string[] row6 = { "6/30/1992", "3", "Dress", "P J Harvey", "Dry" };
-
-			songsDataGridView.Rows.Add(row0);
-			songsDataGridView.Rows.Add(row1);
-			songsDataGridView.Rows.Add(row2);
-			songsDataGridView.Rows.Add(row3);
-			songsDataGridView.Rows.Add(row4);
-			songsDataGridView.Rows.Add(row5);
-			songsDataGridView.Rows.Add(row6);
+			foreach (var row in rows)
+			{
+				songsDataGridView.Rows.Add(row);
+			}
 
 			songsDataGridView.Columns[0].DisplayIndex = 3;
 			songsDataGridView.Columns[1].DisplayIndex = 4;
@@ -164,13 +151,5 @@ namespace WinFormsApp1
 			songsDataGridView.Columns[4].DisplayIndex = 2;
 		}
 
-		/*
-		[STAThreadAttribute()]
-		static void Main()
-		{
-			Application.EnableVisualStyles();
-			Application.Run(new Form0());
-		}
-		*/
 	}
 }
