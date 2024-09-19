@@ -43,7 +43,7 @@ namespace WinFormsApp1
 		private void AddNewRowButton_Click(object? sender, EventArgs e)
 		{
 			Console.WriteLine(">> Click.");
-			var newRow = new string[] { "1", "2", "3" };
+			var newRow = new string[] { "1", "2", "3", "id" };
 			booksDataGridView.Rows.Add(newRow);
 		}
 
@@ -54,8 +54,19 @@ namespace WinFormsApp1
 				this.booksDataGridView.SelectedRows[0].Index !=
 				this.booksDataGridView.Rows.Count - 1)
 			{
-				this.booksDataGridView.Rows.RemoveAt(
-					this.booksDataGridView.SelectedRows[0].Index);
+				var selected = booksDataGridView.SelectedRows[0];
+				var idString = selected.Cells[selected.Cells.Count - 1].Value.ToString(); // id
+				var converted = int.TryParse(idString, out int id);
+				if (converted)
+				{
+					var book = Context.Books.Find(id);
+					if (book != null)
+					{
+						Context.Books.Remove(book);
+						Context.SaveChanges();
+					}
+					booksDataGridView.Rows.RemoveAt(selected.Index);
+				}
 			}
 		}
 
@@ -83,7 +94,7 @@ namespace WinFormsApp1
 		{
 			this.Controls.Add(booksDataGridView);
 
-			booksDataGridView.ColumnCount = 3;
+			booksDataGridView.ColumnCount = 4;
 
 			booksDataGridView.ColumnHeadersDefaultCellStyle.BackColor = Color.Navy;
 			booksDataGridView.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
@@ -104,6 +115,7 @@ namespace WinFormsApp1
 			booksDataGridView.Columns[0].Name = "Title";
 			booksDataGridView.Columns[1].Name = "Author";
 			booksDataGridView.Columns[2].Name = "PublicationYear";
+			booksDataGridView.Columns[3].Name = "Id";
 
 			booksDataGridView.SelectionMode =
 				DataGridViewSelectionMode.FullRowSelect;
@@ -123,8 +135,9 @@ namespace WinFormsApp1
 				string title = book.Title ?? string.Empty;
 				string author = book.Author?.Name ?? string.Empty;
 				string publicationYear = book.PublicationYear.ToString();
+				string id = book.Id.ToString();
 
-				var row = new string[] { title, author, publicationYear };
+				var row = new string[] { title, author, publicationYear, id };
 				booksDataGridView.Rows.Add(row);
 			}
 		}
